@@ -23,7 +23,9 @@ var config = {
     var name = $("#train-name").val().trim();
     var destination = $("#destination").val().trim();
     var tFrequency = $("#frequency").val().trim();
-    var firstTime = $("#first-train").val().trim();
+    var firstTime = "3:30";
+
+    console.log(firstTime)
 
     
     // Code for handling the push
@@ -44,6 +46,8 @@ var config = {
 
   dataRef.ref().on("child_added", function(childSnapshot) {
 
+  console.log(childSnapshot.val());
+  var firstTime = childSnapshot.val().firstTime;
     var firstTimeConverted = moment(firstTime, "HH:mm").subtract(1, "years");
     console.log(firstTimeConverted);
     // Current Time
@@ -53,10 +57,10 @@ var config = {
     var diffTime = moment().diff(moment(firstTimeConverted), "minutes");
     console.log("DIFFERENCE IN TIME: " + diffTime);
     // Time apart (remainder)
-    var tRemainder = diffTime % tFrequency;
+    var tRemainder = diffTime % childSnapshot.val().tFrequency;
     console.log(tRemainder);
     // Minute Until Train
-    var tMinutesTillTrain = tFrequency - tRemainder;
+    var tMinutesTillTrain = childSnapshot.val().tFrequency - tRemainder;
     console.log("MINUTES TILL TRAIN: " + tMinutesTillTrain);
     // Next Train
     var nextTrain = moment().add(tMinutesTillTrain, "minutes");
@@ -66,10 +70,10 @@ var config = {
     $("#curr-trains").append("<tr> " +
       " <th scope='row'> " + childSnapshot.val().name + 
       " </th><td id='tbl_destination'> " + childSnapshot.val().destination +
-      " </td><td id='tbl_frequency'> " + childSnapshot.val().tFrequency+
-      " </td><td id='tbl_next-arrival'> " + childSnapshot.val().nextTrain +
-      " </td><td id='tbl_min-away'> " + childSnapshot.val().tMinutesTillTrain +
-      " </td><td id='tbl_total_billed> " + childSnapshot.val().totalBilled +
+      " </td><td id='tbl_frequency'> " + childSnapshot.val().tFrequency +
+      " </td><td id='tbl_next-arrival'> " + moment(nextTrain).format("hh:mm") +
+      " </td><td id='tbl_min-away'> " + tMinutesTillTrain +
+      // " </td><td id='tbl_total_billed> " + childSnapshot.val().totalBilled +
       //" </td><td id='tbl_total_billed> " + childSnapshot.val().totalBilled +
       " </td></tr>");
 
